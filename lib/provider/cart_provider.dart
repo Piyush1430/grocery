@@ -1,5 +1,3 @@
-import "dart:collection";
-
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:grocery/models/items_model.dart";
 
@@ -41,7 +39,8 @@ class CartNotifier extends StateNotifier<List<ItemsModel>> {
   }
 
   double getTotalPrice() {
-    return state.fold(0, (total, item) => total + double.parse(item.price )* item.quantity);
+    return state.fold(
+        0, (total, item) => total + double.parse(item.price) * item.quantity);
   }
 }
 
