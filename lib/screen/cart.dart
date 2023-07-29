@@ -3,14 +3,21 @@ import "package:flutter_riverpod/flutter_riverpod.dart";
 
 import "package:grocery/provider/cart_provider.dart";
 
-class CartScreen extends ConsumerWidget {
+class CartScreen extends ConsumerStatefulWidget {
   const CartScreen({
     super.key,
   });
+@override
+  ConsumerState<ConsumerStatefulWidget> createState() {
+   return _CartScreenState();
+  }
+}
 
+class _CartScreenState extends ConsumerState{
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final cartItems = ref.watch(cartProvider);
+ 
     return Scaffold(
       body: SafeArea(
         child: Column(
@@ -36,34 +43,106 @@ class CartScreen extends ConsumerWidget {
                 itemCount: cartItems.length,
                 itemBuilder: (context, index) {
                   final items = cartItems[index];
+                  final updatePrice = ref.watch(cartProvider.notifier).updatePrice(items); 
                   return Padding(
-                    padding: const EdgeInsets.all(10.0),
+                    padding: const EdgeInsets.all(10),
                     child: Card(
                       elevation: 4,
                       color: Colors.grey[50],
                       child: ListTile(
-                        leading: Image.asset(
-                          items.imagePath,
-                          height: 36,
-                        ),
-                        title: Text(
-                          items.title,
-                          style:
-                              Theme.of(context).textTheme.bodyLarge!.copyWith(),
-                        ),
-                        subtitle: Text(
-                          "\$${items.price}",
-                          style: const TextStyle(color: Colors.black),
-                        ),
-                        trailing: IconButton(
-                            onPressed: () {
-                              ref.read(cartProvider.notifier).removeItem(items);
-                            },
-                            icon: const Icon(
-                              Icons.cancel,
-                              size: 36,
-                            )),
-                      ),
+                          leading: Image.asset(
+                            items.imagePath,
+                            height: 30,
+                          ),
+                          title: Text(
+                            items.title,
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyLarge!
+                                .copyWith(fontSize: 13),
+                          ),
+                          subtitle: Text(
+                            "\$$updatePrice",
+                            style: const TextStyle(color: Colors.black),
+                          ),
+                          trailing: SizedBox(
+                            width: 152,
+                            // decoration: BoxDecoration(
+                            //   border: Border.all(color: Colors.black)
+                            // ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                              items.quantity>1 ?  ElevatedButton(
+                                  onPressed: () {
+                                    setState(() {
+                                      ref
+                                        .read(cartProvider.notifier)
+                                        .decreaseQuantity(items);
+                                    });
+                                    
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                      padding: const EdgeInsets.only(
+                                          top: 5,
+                                          bottom: 5,
+                                          left: 10,
+                                          right: 10),
+                                      minimumSize: const Size(15, 15),
+                                      foregroundColor: Colors.black),
+                                  child: const Icon(
+                                    Icons.remove,
+                                    size: 10,
+                                  ),
+                                ) : ElevatedButton(
+                                  onPressed: () {
+                                    ref
+                                        .read(cartProvider.notifier)
+                                        .removeItem(items);
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    padding: const EdgeInsets.only(
+                                        top: 5, bottom: 5, left: 10, right: 10),
+                                    minimumSize: const Size(15, 15),
+                                  ),
+                                  child: const  Icon(
+                                    Icons.delete,
+                                    size: 15,
+                                    color: Color.fromARGB(241, 153, 4, 4),
+                                  ),
+                                )
+                                
+                                
+                                ,
+                                Text(items.quantity.toString()),
+                                ElevatedButton(
+                                  onPressed: () {
+
+                                    setState(() {
+                                          ref
+                                        .read(cartProvider.notifier)
+                                        .increaseQuantity(items);
+                                    });
+                                
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                      padding: const EdgeInsets.only(
+                                          top: 5,
+                                          bottom: 5,
+                                          left: 10,
+                                          right: 10),
+                                      minimumSize: const Size(10, 10),
+                                      foregroundColor: Colors.black),
+                                  child: const Icon(
+                                    Icons.add,
+                                    size: 10,
+                                  ),
+                                ),
+                                
+                              ],
+                            ),
+                          )),
                     ),
                   );
                 },
@@ -129,6 +208,14 @@ class CartScreen extends ConsumerWidget {
                 ),
               ),
             ),
+            // IconButton(
+            //                 onPressed: () {
+            //                   ref.read(cartProvider.notifier).removeItem(items);
+            //                 },
+            //                 icon: const Icon(
+            //                   Icons.cancel,
+            //                   size: 36,
+            //                 )),
           ],
         ),
       ),

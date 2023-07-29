@@ -1,7 +1,7 @@
 import "package:flutter/material.dart";
 import "package:grocery/models/items_model.dart";
 
- const   shopList = [
+ final    shopList = [
   ItemsModel(
       title: "Avocado",
       price: "4.00",
